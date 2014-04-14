@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+<Head>
+	<title>HTML API Demo</title>
+	<style>
+		ul {list-style: none;}
+	</style>
+</head>
+<body>
+	<ul>
+		<li><strong>User Agent:</strong> <span id="userAgent"></span></li>
+		<li><strong>Touch:</strong> <span id="touch"></span></li>
+		<li><strong>Current Orientation:</strong> <span id="myspan"></span></li>
+		<li><strong>View Port:</strong> <span id="mode"></span></li>
+		<li><strong>Axis Measurements:</strong> <span id="log"></span></li>
+		<li><strong>Starting Location:</strong> <span id="location"></span></li>
+		<li><strong>Current Location:</strong> <span id="currentloc"></span></li>
+		<strong>Current Map:</strong>
+		<div id="map"></div>
+	</ul>
+	<script>
+		document.getElementById("userAgent").innerHTML = navigator.userAgent;
+		
+		var touch = document.getElementById("touch");
+		if (window.Touch){
+			touch.innerHTML = "Enabled";
+		}else{
+			touch.innerHTML = "Not Enabled";
+		}
+		
+		window.addEventListener("load", function(event){
+			var span = document.getElementById("myspan");
+			span.innerHTML = window.orientation;
+			modeDetect();
+		
+			window.addEventListener( "orientationchange", function(event){
+				span.innerHTML = window.orientation;
+				modeDetect();
+		
+			});
+		
+		});
+		
+		
+		
+		
+		function modeDetect(){
+		
+			var height = window.innerHeight,
+				    width = window.innerWidth,
+				    mode = document.getElementById("mode");
+		
+				if (width > height){
+		
+					mode.innerHTML = "Landscape";
+				}else{
+					mode.innerHTML = "Portrait";
+				}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		if(window.DeviceMotionEvent) {
+		  window.addEventListener("devicemotion", process, false);
+		} else {
+		    document.getElementById("log").innerHTML = "Device Motion not supported";
+		}
+		function process(event) {
+		  var x = event.accelerationIncludingGravity.x;
+		  var y = event.accelerationIncludingGravity.y;
+		  var z = event.accelerationIncludingGravity.z;
+		  document.getElementById("log").innerHTML = "<ul><li>X : " + x + "</li><li>Y : " + y + "</li><li>Z : " + z + "</li></ul>"; 
+		}
+		
+		
+		if (navigator.geolocation) {
+			
+		navigator.geolocation.getCurrentPosition(function(position){ 	
+			document.getElementById("location").innerHTML = position.coords.latitude + " " + position.coords.longitude; 
+		});
+		
+		
+		navigator.geolocation.watchPosition(function(position){ 	
+			document.getElementById("currentloc").innerHTML = position.coords.latitude + " " + position.coords.longitude; 
+			
+			var pos=position.coords.latitude + "," + position.coords.longitude;
+		
+			var display="http://maps.googleapis.com/maps/api/staticmap?center=" + pos + "&zoom=15&size=350x350&markers=" + pos + "&sensor=true";
+			
+			var img_display = "<IMG SRC=" + display + ">";
+		
+			document.getElementById("map").innerHTML=img_display;
+		});
+		
+		}
+		 
+		
+	</script>
+</body>
+</html>
