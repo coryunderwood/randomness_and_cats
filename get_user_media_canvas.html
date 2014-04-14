@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+		<style>
+			video, img{width: 307px;}
+		</style>
+	</head>
+	<body>
+		<div id="video-container">
+			<video id="camera-stream" autoplay controls></video>
+			<img />
+			<canvas style="display:none" width="640" height="480"></canvas>
+		</div>
+		<button id="sshot">Screenshot!</button>
+		<script>
+			var video =  document.querySelector('video'),
+				stream = null,
+			    canvas = document.querySelector('canvas'),
+			    ctx = canvas.getContext('2d'),
+			    localMediaStream = null;
+			
+			/*Screen Shot function is pretty neat.   It looks for a stream (which we set when we made the video).  
+			If Found it Copies the current frame to a hidden Canvas element.	
+			From there, we use Canvas drawImage function to copy what is currently in the Canvas to a base64 image.
+			Chrome uses webp, but other clients will default to png.
+			You can make another function to AJAX the Base64 Data to a PHP back end, and decode it and write to disk.
+			*/
+			
+			$("#sshot").on("click", function(){
+			  if (stream) {
+			   ctx.drawImage(video, 0, 0);
+			    document.querySelector('img').src = canvas.toDataURL('image/webp');
+			  }
+			});
+			
+			
+			/*Vendor Pre-fixes suck.   Works for sure in Chrome with webkit Prefix, Opera without Prefix, Firefox with a Flag set, and Mobile clients if the Flags are set.   
+			Either way, I am not typing all that out every time.*/
+			
+			navigator.getUserMedia  = navigator.getUserMedia || 
+			                         navigator.webkitGetUserMedia ||
+			                          navigator.mozGetUserMedia || 
+			                           navigator.msGetUserMedia;
+			
+			if (navigator.webkitGetUserMedia) {
+			  // Request the camera. Support for this is flakey, expect it to fail
+			  navigator.webkitGetUserMedia(
+			    // Constraints - You can also grab Audio! Just uncomment
+			    {
+			      video: true // ,audio: true
+			    },
+			
+			    // Success Callback
+			    function(localMediaStream) {
+							// Get a reference to the video element on the page.
+							var vid = document.getElementById('camera-stream');
+			
+							// Create an object URL for the video stream and use this 
+							// to set the video source. 
+							vid.src = window.URL.createObjectURL(localMediaStream);
+							stream = localMediaStream;
+			    },
+			
+			    // Error Callback
+			    function(err) {
+			      // Log the error to the console.
+			      console.log('The following error occurred when trying to use getUserMedia: ' + err);
+			    }
+			  );
+			
+			} else {
+			  alert('Sorry, your browser does not support getUserMedia');
+			}
+			  
+			  
+			  
+		</script>
+	</body>
+</html>
